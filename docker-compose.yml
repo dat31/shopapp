@@ -1,0 +1,35 @@
+version: '3.8'
+
+services:
+  nestjs-app:
+    image: your-nest-image:latest
+    container_name: nestjs-app
+    environment:
+      - NODE_ENV=production
+      - HOST=mysql
+      - PORT=3306
+      - DB_USERNAME=root
+      - DB_PW=123456
+      - DB_NAME=test
+    ports:
+      - "3000:3000"
+    depends_on:
+      - mysql
+    networks:
+      - app-network
+
+  mysql:
+    image: mysql/mysql-server:latest
+    container_name: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_DATABASE: test
+      MYSQL_USER: root
+      MYSQL_PASSWORD: 123456
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+
+networks:
+  app-network:
