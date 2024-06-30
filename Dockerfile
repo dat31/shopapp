@@ -13,6 +13,7 @@ WORKDIR /src
 
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
 COPY package*.json ./
+COPY service-account-key.json ./
 
 # Install app dependencies
 RUN npm install

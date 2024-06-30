@@ -6,6 +6,8 @@ import { Order } from './entities/order.entity';
 import { OrderitemsModule } from 'routes/orderitems/orderitems.module';
 import { ProductsModule } from 'routes/products/products.module';
 import { UsersModule } from 'routes/users/users.module';
+import { SocketModule } from 'socket/socket.module';
+import { OrderSubscriber } from './subscribers';
 
 @Module({
   imports: [
@@ -13,8 +15,9 @@ import { UsersModule } from 'routes/users/users.module';
     OrderitemsModule,
     ProductsModule,
     UsersModule,
+    SocketModule,
   ],
   controllers: [OrdersController],
-  providers: [OrdersService],
+  providers: [OrdersService, OrderSubscriber],
 })
 export class OrdersModule {}

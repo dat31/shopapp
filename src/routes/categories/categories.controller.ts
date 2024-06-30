@@ -20,6 +20,11 @@ export class CategoriesController {
     return this.categoriesService.create(createCategoryDto);
   }
 
+  @Get('/products')
+  findAllProducts() {
+    return this.categoriesService.findAllProducts();
+  }
+
   @Get()
   findAll() {
     return this.categoriesService.findAll();

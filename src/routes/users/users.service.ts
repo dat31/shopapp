@@ -5,7 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { cloneDeep, omit } from 'lodash';
+import { omit } from 'lodash';
 import { EmployeeSchedulesService } from 'routes/employee-schedules/employee-schedules.service';
 
 @Injectable()
@@ -36,11 +36,15 @@ export class UsersService {
     return this.userRepo.findOne({
       where: { id },
       relations: { employees: true },
+      select: { password: false },
     });
   }
 
   findByUsername(username: string) {
-    return this.userRepo.findOne({ where: { username } });
+    return this.userRepo.findOne({
+      where: { username },
+      select: ['username', 'password', 'id'],
+    });
   }
 
   findSchedules(employeeId: User['id']) {
@@ -52,23 +56,32 @@ export class UsersService {
   findEmployees(id: User['id']) {
     return this.userRepo.find({
       where: { owner: { id } },
-      select: { password: false },
     });
   }
 
   findEmployeeDetail(id: User['id'], ownerId: User['id']) {
     return this.userRepo.findOne({
-      select: { password: false },
       where: { id, owner: { id: ownerId } },
     });
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto, ownerId: User['id']) {
+  async updateEmployee(
+    id: number,
+    updateUserDto: UpdateUserDto,
+    ownerId: User['id'],
+  ) {
     const owner = await this.findOne(ownerId);
     if (!owner) {
       throw new NotFoundException();
     }
     return this.userRepo.save(updateUserDto);
+  }
+
+  update(id: number, updateUserDto: UpdateUserDto) {
+    return this.userRepo.save({
+      id,
+      ...updateUserDto,
+    });
   }
 
   remove(id: number) {

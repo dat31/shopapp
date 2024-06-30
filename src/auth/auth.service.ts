@@ -17,6 +17,7 @@ export class AuthService {
 
   async login({ username, password }: LoginDto) {
     const user = await this.userService.findByUsername(username);
+    console.log('login', user);
     if (!user) {
       throw new UnauthorizedException();
     }
@@ -39,6 +40,13 @@ export class AuthService {
   }
 
   getProfile(id: User['id']) {
+    if (!id) {
+      throw new UnauthorizedException();
+    }
     return this.userService.findOne(id);
+  }
+
+  update(id: User['id'], data: Partial<User>) {
+    return this.userService.update(id, data);
   }
 }

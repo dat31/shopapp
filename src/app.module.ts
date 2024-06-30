@@ -10,6 +10,7 @@ import { OrderitemsModule } from 'routes/orderitems/orderitems.module';
 import { EmployeeSchedule } from 'routes/employee-schedules/entities/employee-schedule.entity';
 import { PaymentsModule } from 'routes/payments/payments.module';
 import { EmployeeSchedulesModule } from 'routes/employee-schedules/employee-schedules.module';
+import { SocketModule } from './socket/socket.module';
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { EmployeeSchedulesModule } from 'routes/employee-schedules/employee-sche
     EmployeeSchedule,
     PaymentsModule,
     EmployeeSchedulesModule,
+    SocketModule,
   ],
 })
 export class AppModule {}

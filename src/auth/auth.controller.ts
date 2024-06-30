@@ -4,12 +4,14 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  Patch,
   Post,
   Request,
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { LoginDto, RegisterDto } from './dto/login.dto';
 import { Auth } from './decorators/auth.decorator';
+import { UpdateUserDto } from 'routes/users/dto/update-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -31,5 +33,11 @@ export class AuthController {
   @Post('register')
   register(@Body() registerDto: RegisterDto) {
     return this.authService.register(registerDto);
+  }
+
+  @Auth()
+  @Patch()
+  update(@Request() req, @Body() dto: UpdateUserDto) {
+    return this.authService.update(req.user.id, dto);
   }
 }

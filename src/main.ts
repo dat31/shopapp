@@ -3,7 +3,8 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as session from 'express-session';
 import * as morgan from 'morgan';
-import { sign, verify } from 'jsonwebtoken';
+import admin from 'firebase-admin';
+import { readFileSync } from 'fs';
 
 NestFactory.create(AppModule)
   .then((app) => {
@@ -16,9 +17,13 @@ NestFactory.create(AppModule)
         saveUninitialized: false,
       }),
     );
-
-    const token = sign({ hello: 'aaa' }, 'aaa');
-    console.log(verify(token, 'aaa'));
+    admin.initializeApp({
+      credential: admin.credential.cert(
+        JSON.parse(
+          readFileSync(__dirname.concat('/service-account-key.json'), 'utf-8'),
+        ),
+      ),
+    });
 
     return app.listen(3000);
   })

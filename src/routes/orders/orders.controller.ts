@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  HttpCode,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -37,6 +38,7 @@ export class OrdersController {
   }
 
   @Post('/items/:id')
+  @HttpCode(201)
   createOrderItem(@Param('id') id: string, @Body() dto: CreateOrderItemDto) {
     return this.ordersService.createItem(+id, dto);
   }

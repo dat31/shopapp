@@ -30,8 +30,11 @@ export class User {
   @Column({ nullable: true })
   address: string;
 
-  @Column()
+  @Column({ select: false })
   password: string;
+
+  @Column()
+  token: string;
 
   @Column({ type: 'enum', enum: Role, default: Role.CUSTOMER })
   role: Role;
@@ -45,7 +48,7 @@ export class User {
   schedules: EmployeeSchedule[];
 
   @OneToMany(() => User, (u) => u.owner)
-  employees: User;
+  employees: User[];
 
   @ManyToOne(() => User, (u) => u.employees)
   owner: User;

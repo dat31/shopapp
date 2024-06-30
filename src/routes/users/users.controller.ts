@@ -65,14 +65,12 @@ export class UsersController {
 
   @Auth()
   @Patch('/employees/:id')
-  update(
+  updateEmployee(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
     @Request() req,
   ) {
-    console.log(updateUserDto);
-
-    return this.usersService.update(+id, updateUserDto, req.user.id);
+    return this.usersService.updateEmployee(+id, updateUserDto, req.user.id);
   }
 
   @Delete(':id')

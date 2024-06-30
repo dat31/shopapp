@@ -17,7 +17,11 @@ export class CategoriesService {
     return this.catRepo.save({ ...new Category(), name });
   }
 
-  async findAll() {
+  findAll() {
+    return this.catRepo.find();
+  }
+
+  async findAllProducts() {
     return this.catRepo.find({ relations: { products: true } });
   }
 

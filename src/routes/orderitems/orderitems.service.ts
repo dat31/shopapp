@@ -27,7 +27,7 @@ export class OrderItemService {
       price: prod.price,
     };
     const resp = await this.repo.save(odItem);
-    console.log(resp);
+    console.log('resp', resp);
     return resp;
   }
 
@@ -53,9 +53,6 @@ export class OrderItemService {
     if (!item) {
       throw new NotFoundException();
     }
-    if (item.quantity === quantity) {
-      return item;
-    }
 
     if (item.quantity === 0) {
       return this.repo.delete(id);
@@ -63,7 +60,9 @@ export class OrderItemService {
     const resp = await this.repo.save({
       id,
       quantity,
+      price: item.product.price,
     });
+    console.log('qty', { ...resp, product: item.product });
     return { ...resp, product: item.product };
   }
 
