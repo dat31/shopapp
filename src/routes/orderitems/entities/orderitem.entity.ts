@@ -23,9 +23,13 @@ export class OrderItem {
   product: Product;
 
   @BeforeInsert()
-  updatePrice() {
+  setDefaultPrice() {
     this.price = this.product.price;
   }
+
   @Column({ type: 'decimal', nullable: true })
   price: number;
+
+  @Column({ nullable: true })
+  note: string;
 }

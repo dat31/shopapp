@@ -42,7 +42,8 @@ export class OrderItemService {
     });
   }
 
-  async update(id: number, { quantity }: UpdateOrderItemDto) {
+  async update(id: number, { quantity, note }: UpdateOrderItemDto) {
+    console.log('quantity', { quantity, note });
     const item = await this.repo
       .createQueryBuilder('orderItem')
       .withDeleted()
@@ -57,12 +58,16 @@ export class OrderItemService {
     if (item.quantity === 0) {
       return this.repo.delete(id);
     }
-    const resp = await this.repo.save({
-      id,
-      quantity,
-      price: item.product.price,
-    });
-    console.log('qty', { ...resp, product: item.product });
+    const resp = await this.repo.save(
+      {
+        id,
+        quantity,
+        price: item.product.price,
+        note,
+      },
+      { reload: true },
+    );
+    console.log('resp', resp);
     return { ...resp, product: item.product };
   }
 
