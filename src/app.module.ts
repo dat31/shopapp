@@ -11,6 +11,7 @@ import { EmployeeSchedule } from 'routes/employee-schedules/entities/employee-sc
 import { PaymentsModule } from 'routes/payments/payments.module';
 import { EmployeeSchedulesModule } from 'routes/employee-schedules/employee-schedules.module';
 import { SocketModule } from './socket/socket.module';
+import { AuthzModule } from './authz/authz.module';
 
 @Module({
   imports: [
@@ -18,9 +19,9 @@ import { SocketModule } from './socket/socket.module';
       envFilePath: ['.env.dev'],
     }),
     TypeOrmModule.forRoot({
-      type: 'mysql',
+      type: 'postgres',
       host: process.env.HOST,
-      port: 3306,
+      port: 5432,
       username: process.env.DB_USERNAME,
       password: process.env.DB_PW,
       database: process.env.DB_NAME,
@@ -37,6 +38,7 @@ import { SocketModule } from './socket/socket.module';
     PaymentsModule,
     EmployeeSchedulesModule,
     SocketModule,
+    // AuthzModule,
   ],
 })
 export class AppModule {}

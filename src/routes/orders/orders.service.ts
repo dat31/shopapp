@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'routes/users/users.service';
 import { CreateOrderItemDto } from 'routes/orderitems/dto/create-orderitem.dto';
+import { User } from 'routes/users/entities/user.entity';
 
 @Injectable()
 export class OrdersService {
@@ -16,12 +17,17 @@ export class OrdersService {
     private userService: UsersService,
   ) {}
 
-  async create({ orderItems }: CreateOrderDto) {
+  async create(creatorId: User['id'], { orderItems }: CreateOrderDto) {
     const od = new Order();
     od.orderDate = new Date();
     // if (user?.id) {
     //   od.customer = await this.userService.findOne(user.id);
     // }
+    const creator = await this.userService.findOne(creatorId);
+
+    console.log('creator', creator);
+    od.creator = creator;
+
     const createdOd = await this.odRepo.save(od);
     if (orderItems) {
       await Promise.all(
@@ -61,7 +67,7 @@ export class OrdersService {
       .getOne();
   }
 
-  update(id: number, updateOrderDto: UpdateOrderDto) {
+  async update(id: number, updateOrderDto: UpdateOrderDto) {
     return this.odRepo.save({ id, ...updateOrderDto });
   }
 

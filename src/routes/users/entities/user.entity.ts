@@ -33,7 +33,7 @@ export class User {
   @Column({ select: false })
   password: string;
 
-  @Column()
+  @Column({ nullable: true })
   token: string;
 
   @Column({ type: 'enum', enum: Role, default: Role.CUSTOMER })

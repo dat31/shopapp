@@ -19,7 +19,7 @@ export class Order {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'timestamp' })
   orderDate: Date;
 
   @ManyToOne(() => User, (user) => user.orders, {
@@ -32,9 +32,12 @@ export class Order {
   })
   items: OrderItem[];
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { eager: true })
   creator: User;
 
   @Column({ type: 'enum', enum: Status, default: Status.CREATED })
   status: Status;
+
+  @Column({ nullable: true, default: '#' })
+  table: string;
 }

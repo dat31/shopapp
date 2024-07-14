@@ -9,9 +9,9 @@ export class EmployeeSchedule {
   @ManyToOne(() => User, (user) => user.schedules)
   employee: User;
 
-  @Column({ type: 'datetime' })
+  @Column({ type: 'timestamp' })
   shiftStartTime: Date;
 
-  @Column({ nullable: true, type: 'datetime' })
+  @Column({ nullable: true, type: 'timestamp' })
   shiftEndTime: Date;
 }

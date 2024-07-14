@@ -19,16 +19,14 @@ export class OrderItemService {
     { product, quantity }: CreateOrderItemDto,
   ) {
     const prod = await this.prodService.findOne(product.id);
-    const odItem = {
+    const item = {
       ...new OrderItem(),
       product: prod,
       order: { id: orderId },
       quantity,
       price: prod.price,
     };
-    const resp = await this.repo.save(odItem);
-    console.log('resp', resp);
-    return resp;
+    return this.repo.save(item);
   }
 
   async findAll() {
@@ -43,7 +41,6 @@ export class OrderItemService {
   }
 
   async update(id: number, { quantity, note }: UpdateOrderItemDto) {
-    console.log('quantity', { quantity, note });
     const item = await this.repo
       .createQueryBuilder('orderItem')
       .withDeleted()
@@ -55,19 +52,12 @@ export class OrderItemService {
       throw new NotFoundException();
     }
 
-    if (item.quantity === 0) {
-      return this.repo.delete(id);
-    }
-    const resp = await this.repo.save(
-      {
-        id,
-        quantity,
-        price: item.product.price,
-        note,
-      },
-      { reload: true },
-    );
-    console.log('resp', resp);
+    const resp = await this.repo.save({
+      id,
+      quantity,
+      price: item.product.price,
+      note,
+    });
     return { ...resp, product: item.product };
   }
 
