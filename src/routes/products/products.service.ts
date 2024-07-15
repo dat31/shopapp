@@ -6,6 +6,7 @@ import { Product } from './entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SocketService } from 'socket/socket.service';
 import { Category } from 'routes/categories/entities/category.entity';
+import { isEqual } from 'lodash';
 
 @Injectable()
 export class ProductsService {
@@ -16,30 +17,53 @@ export class ProductsService {
     private socketService: SocketService,
   ) {}
 
-  async create({ category: { id }, ...body }: CreateProductDto) {
-    const category = await this.catRepo.findOne({ where: { id } });
+  async create({ category, ...body }: CreateProductDto) {
     const prod = {
       ...new Product(),
       ...body,
     } as unknown as Product;
-    prod.category = category as any;
+    if (category?.id) {
+      const prodCategory = await this.catRepo.findOne({
+        where: { id: category?.id },
+      });
+      prod.category = prodCategory as any;
+    }
     return this.prodRepo.save(prod);
   }
 
   async findAll() {
-    const prods = await this.prodRepo.find({
+    const products = await this.prodRepo.find({
       relations: { category: true },
     });
-    this.socketService.emit(prods);
-    return prods;
+
+    const categories = products.reduce((acc, product) => {
+      if (acc.find((category) => isEqual(category, product.category))) {
+        return acc;
+      }
+      return [...acc, product.category];
+    }, []);
+
+    return categories.map((category) => ({
+      ...category,
+      products: products.filter((product) =>
+        isEqual(product.category, category),
+      ),
+    }));
   }
 
   findOne(id: number) {
-    return this.prodRepo
-      .createQueryBuilder()
-      .withDeleted()
-      .where({ id })
-      .getOne();
+    return this.prodRepo.findOne({
+      withDeleted: true,
+      where: { id },
+      relations: { category: true },
+    });
+
+    // return this.prodRepo
+    //   .createQueryBuilder()
+    //   .withDeleted()
+    //   .where({ id })
+    //   .leftJoinAndSelect('category', 'category')
+    //   .getOne();
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
