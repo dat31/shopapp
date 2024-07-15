@@ -12,6 +12,7 @@ import { PaymentsModule } from 'routes/payments/payments.module';
 import { EmployeeSchedulesModule } from 'routes/employee-schedules/employee-schedules.module';
 import { SocketModule } from './socket/socket.module';
 import { AuthzModule } from './authz/authz.module';
+import { S3Module } from './s3/s3.module';
 
 @Module({
   imports: [
@@ -38,7 +39,8 @@ import { AuthzModule } from './authz/authz.module';
     PaymentsModule,
     EmployeeSchedulesModule,
     SocketModule,
-    // AuthzModule,
+    AuthzModule,
+    S3Module,
   ],
 })
 export class AppModule {}
