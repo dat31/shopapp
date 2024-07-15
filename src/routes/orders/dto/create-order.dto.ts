@@ -1,7 +1,7 @@
+import { PartialType } from '@nestjs/mapped-types';
 import { CreateOrderItemDto } from 'routes/orderitems/dto/create-orderitem.dto';
-import { User } from 'routes/users/entities/user.entity';
+import { Order } from '../entities/order.entity';
 
-export class CreateOrderDto {
+export class CreateOrderDto extends PartialType(Order) {
   orderItems: CreateOrderItemDto[];
-  creator: Pick<User, 'id'>;
 }

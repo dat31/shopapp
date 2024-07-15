@@ -8,6 +8,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'routes/users/users.service';
 import { CreateOrderItemDto } from 'routes/orderitems/dto/create-orderitem.dto';
 import { User } from 'routes/users/entities/user.entity';
+import { assign } from 'lodash';
 
 @Injectable()
 export class OrdersService {
@@ -17,18 +18,10 @@ export class OrdersService {
     private userService: UsersService,
   ) {}
 
-  async create(creatorId: User['id'], { orderItems }: CreateOrderDto) {
-    const od = new Order();
-    od.orderDate = new Date();
-    // if (user?.id) {
-    //   od.customer = await this.userService.findOne(user.id);
-    // }
-    const creator = await this.userService.findOne(creatorId);
-
-    console.log('creator', creator);
-    od.creator = creator;
-
-    const createdOd = await this.odRepo.save(od);
+  async create(creatorId: User['id'], { orderItems, ...data }: CreateOrderDto) {
+    const order = assign(new Order(), data);
+    order.orderDate = data.orderDate ? new Date(data.orderDate) : new Date();
+    const createdOd = await this.odRepo.save(order);
     if (orderItems) {
       await Promise.all(
         orderItems.map((odItem) =>
@@ -62,7 +55,6 @@ export class OrdersService {
       .where({ id })
       .leftJoinAndSelect('order.items', 'items')
       .leftJoinAndSelect('items.product', 'product')
-      .leftJoinAndSelect('order.customer', 'customer')
       .leftJoinAndSelect('order.creator', 'creator')
       .getOne();
   }
