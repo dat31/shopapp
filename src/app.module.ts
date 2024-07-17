@@ -3,7 +3,6 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsModule } from 'routes/products/products.module';
 import { CategoriesModule } from 'routes/categories/categories.module';
 import { ConfigModule } from '@nestjs/config';
-import { AuthModule } from 'auth/auth.module';
 import { UsersModule } from 'routes/users/users.module';
 import { OrdersModule } from 'routes/orders/orders.module';
 import { OrderitemsModule } from 'routes/orderitems/orderitems.module';
@@ -11,8 +10,8 @@ import { EmployeeSchedule } from 'routes/employee-schedules/entities/employee-sc
 import { PaymentsModule } from 'routes/payments/payments.module';
 import { EmployeeSchedulesModule } from 'routes/employee-schedules/employee-schedules.module';
 import { SocketModule } from './socket/socket.module';
-import { AuthzModule } from './authz/authz.module';
 import { S3Module } from './s3/s3.module';
+import { FirebaseAdminModule } from './firebase-admin/firebase-admin.module';
 
 @Module({
   imports: [
@@ -31,7 +30,6 @@ import { S3Module } from './s3/s3.module';
     }),
     ProductsModule,
     CategoriesModule,
-    AuthModule,
     UsersModule,
     OrdersModule,
     OrderitemsModule,
@@ -39,8 +37,8 @@ import { S3Module } from './s3/s3.module';
     PaymentsModule,
     EmployeeSchedulesModule,
     SocketModule,
-    AuthzModule,
     S3Module,
+    FirebaseAdminModule,
   ],
 })
 export class AppModule {}

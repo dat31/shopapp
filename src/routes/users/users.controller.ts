@@ -7,13 +7,10 @@ import {
   Param,
   Delete,
   Request,
-  UseGuards,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Auth } from 'auth/decorators/auth.decorator';
-import { AuthGuard } from '@nestjs/passport';
 
 @Controller('users')
 export class UsersController {
@@ -34,28 +31,26 @@ export class UsersController {
     return this.usersService.findSchedules(+id);
   }
 
-  // @UseGuards(AuthGuard('jwt'))
-  @Auth()
   @Get('/employees')
   findEmployees(@Request() req) {
     console.log(req.user.id);
     return this.usersService.findEmployees(req.user.id);
   }
 
-  @Auth()
+  // @Auth()
   @Post('/employees')
   createEmployees(@Request() req, @Body() dto: CreateUserDto) {
     console.log('kk', req.user);
     return this.usersService.createEmployee(dto, req.user.id);
   }
 
-  @Auth()
+  // @Auth()
   @Delete('/employees/:id')
   deleteEmployee(@Request() req, @Param('id') id: string) {
     return this.usersService.removeEmployee(+id, req.user.id);
   }
 
-  @Auth()
+  // @Auth()
   @Get('/employees/:id')
   findEmployeeDetail(@Request() req, @Param('id') id: string) {
     return this.usersService.findEmployeeDetail(+id, req.user.id);
@@ -67,7 +62,7 @@ export class UsersController {
     return this.usersService.findOne(+id);
   }
 
-  @Auth()
+  // @Auth()
   @Patch('/employees/:id')
   updateEmployee(
     @Param('id') id: string,

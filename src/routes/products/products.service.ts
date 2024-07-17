@@ -7,6 +7,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { SocketService } from 'socket/socket.service';
 import { Category } from 'routes/categories/entities/category.entity';
 import { isEqual } from 'lodash';
+import { FirebaseAdminService } from 'firebase-admin/firebase-admin.service';
 
 @Injectable()
 export class ProductsService {
@@ -15,6 +16,7 @@ export class ProductsService {
     @InjectRepository(Category) private catRepo: Repository<Product>,
 
     private socketService: SocketService,
+    private firebaseAdminService: FirebaseAdminService,
   ) {}
 
   async create({ category, ...body }: CreateProductDto) {
