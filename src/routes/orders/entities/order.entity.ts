@@ -22,11 +22,6 @@ export class Order {
   @Column({ type: 'timestamp' })
   orderDate: Date;
 
-  @ManyToOne(() => User, (user) => user.orders, {
-    nullable: true,
-  })
-  customer: User;
-
   @OneToMany(() => OrderItem, (orderItem) => orderItem.order, {
     nullable: true,
   })

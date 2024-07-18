@@ -14,6 +14,7 @@ import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { S3Service } from 's3/s3.service';
+import { FirebaseAuth } from 'firebase-admin/firebase-auth.decorator';
 
 @Controller('products')
 export class ProductsController {
@@ -22,6 +23,7 @@ export class ProductsController {
     private readonly s3Service: S3Service,
   ) {}
 
+  @FirebaseAuth()
   @Post()
   @UseInterceptors(FileInterceptor('file'))
   create(

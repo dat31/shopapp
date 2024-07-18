@@ -21,12 +21,12 @@ export class EmployeeSchedulesService {
     shiftStartTime,
     ...createEmployeeScheduleDto
   }: CreateEmployeeScheduleDto) {
-    if (!createEmployeeScheduleDto.employee?.id) {
+    if (!createEmployeeScheduleDto.employee?.uid) {
       throw new NotFoundException();
     }
     const employee = await this.userRepo.findOne({
       where: {
-        id: createEmployeeScheduleDto.employee.id,
+        uid: createEmployeeScheduleDto.employee.uid,
       },
     });
     if (!employee) {
@@ -46,8 +46,8 @@ export class EmployeeSchedulesService {
     return `This action returns all employeeSchedules`;
   }
 
-  findAllByEmployeeId(employeeId: User['id']) {
-    return this.repo.find({ where: { employee: { id: employeeId } } });
+  findAllByEmployeeId(employeeId: User['uid']) {
+    return this.repo.find({ where: { employee: { uid: employeeId } } });
   }
 
   findOne(id: number) {

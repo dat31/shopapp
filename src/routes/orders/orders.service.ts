@@ -9,6 +9,7 @@ import { UsersService } from 'routes/users/users.service';
 import { CreateOrderItemDto } from 'routes/orderitems/dto/create-orderitem.dto';
 import { User } from 'routes/users/entities/user.entity';
 import { assign } from 'lodash';
+import { FirebaseAdminService } from 'firebase-admin/firebase-admin.service';
 
 @Injectable()
 export class OrdersService {
@@ -16,11 +17,16 @@ export class OrdersService {
     @InjectRepository(Order) private odRepo: Repository<Order>,
     private odItemService: OrderItemService,
     private userService: UsersService,
+    private firebaseAdminService: FirebaseAdminService,
   ) {}
 
-  async create(creatorId: User['id'], { orderItems, ...data }: CreateOrderDto) {
+  async create(
+    creatorId: User['uid'],
+    { orderItems, ...data }: CreateOrderDto,
+  ) {
     const order = assign(new Order(), data);
     order.orderDate = data.orderDate ? new Date(data.orderDate) : new Date();
+    order.creator = { uid: creatorId } as User;
     const createdOd = await this.odRepo.save(order);
     if (orderItems) {
       await Promise.all(
@@ -36,16 +42,27 @@ export class OrdersService {
     return this.odItemService.create(orderId, orderItem);
   }
 
-  findAll() {
-    return this.odRepo.find({
+  async findAll(userUid: User['uid']) {
+    this.firebaseAdminService.auth
+      .getUser('Cj5f0Fpb4zRHk8yJL11Br3RQS9m1')
+      .then((yser) => {
+        console.log(yser);
+      });
+
+    const orders = await this.odRepo.find({
+      where: [
+        { creator: { uid: userUid } },
+        { creator: { owner: { uid: userUid } } },
+      ],
       relations: {
-        customer: true,
         creator: true,
         items: {
           product: { category: true },
         },
       },
     });
+
+    return orders;
   }
 
   findOne(id: number) {

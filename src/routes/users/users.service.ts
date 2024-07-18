@@ -1,12 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { omit } from 'lodash';
 import { EmployeeSchedulesService } from 'routes/employee-schedules/employee-schedules.service';
+import { assign } from 'lodash';
 
 @Injectable()
 export class UsersService {
@@ -16,59 +15,48 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
-    const user = { ...new User(), ...createUserDto };
-    user.password = await bcrypt.hash(createUserDto.password, 10);
-    return omit(this.userRepo.save(user), 'password');
+    return this.userRepo.save(createUserDto);
   }
 
-  async createEmployee(createUserDto: CreateUserDto, ownerId: number) {
-    console.log('ownerId', ownerId);
-    const user = { ...new User(), ...createUserDto, owner: { id: ownerId } };
-    user.password = await bcrypt.hash(createUserDto.password, 10);
-    return omit(this.userRepo.save(user), 'password');
+  async createEmployee(createUserDto: CreateUserDto, ownerId: string) {
+    const owner = this.userRepo.findOne({ where: { uid: ownerId } });
+    const employee = assign(new User(), {
+      ...createUserDto,
+      owner,
+    });
+
+    return this.userRepo.save(employee);
   }
 
-  findAll() {
-    return `This action returns all users`;
-  }
-
-  findOne(id: number) {
+  findOne(uid: string) {
     return this.userRepo.findOne({
-      where: { id },
+      where: { uid },
       relations: { employees: true },
-      select: { password: false },
     });
   }
 
-  findByUsername(username: string) {
-    return this.userRepo.findOne({
-      where: { username },
-      select: ['username', 'password', 'id'],
-    });
-  }
-
-  findSchedules(employeeId: User['id']) {
+  findSchedules(employeeId: User['uid']) {
     return this.scheduleService.findAllByEmployeeId(employeeId);
   }
 
   findEmployeeSchedules() {}
 
-  findEmployees(id: User['id']) {
+  findEmployees(uid: User['uid']) {
     return this.userRepo.find({
-      where: { owner: { id } },
+      where: { owner: { uid } },
     });
   }
 
-  findEmployeeDetail(id: User['id'], ownerId: User['id']) {
+  findEmployeeDetail(uid: User['uid'], ownerId: User['uid']) {
     return this.userRepo.findOne({
-      where: { id, owner: { id: ownerId } },
+      where: { uid, owner: { uid: ownerId } },
     });
   }
 
   async updateEmployee(
-    id: number,
+    uid: string,
     updateUserDto: UpdateUserDto,
-    ownerId: User['id'],
+    ownerId: User['uid'],
   ) {
     const owner = await this.findOne(ownerId);
     if (!owner) {
@@ -84,14 +72,10 @@ export class UsersService {
     });
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} user`;
-  }
-
-  removeEmployee(id: number, ownerId: number) {
+  removeEmployee(uid: string, ownerId: string) {
     return this.userRepo.delete({
-      id,
-      owner: { id: ownerId },
+      uid,
+      owner: { uid: ownerId },
     });
   }
 }

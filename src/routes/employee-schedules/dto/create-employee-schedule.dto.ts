@@ -6,5 +6,5 @@ export class CreateEmployeeScheduleDto extends OmitType(EmployeeSchedule, [
   'id',
   'employee',
 ]) {
-  employee: Pick<User, 'id'>;
+  employee: Pick<User, 'uid'>;
 }

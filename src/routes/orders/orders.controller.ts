@@ -8,24 +8,30 @@ import {
   Delete,
   HttpCode,
   Request,
+  UseInterceptors,
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { CreateOrderItemDto } from 'routes/orderitems/dto/create-orderitem.dto';
+import { FirebaseAuth } from 'firebase-admin/firebase-auth.decorator';
+import { GetCreatorInterceptor } from './get-creator.interceptor';
 
 @Controller('orders')
 export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
+  @FirebaseAuth()
   @Post()
   create(@Body() createOrderDto: CreateOrderDto, @Request() req) {
-    return this.ordersService.create(req.user?.id, createOrderDto);
+    return this.ordersService.create(req.user?.uid, createOrderDto);
   }
 
+  @UseInterceptors(GetCreatorInterceptor)
+  @FirebaseAuth()
   @Get()
-  findAll() {
-    return this.ordersService.findAll();
+  findAll(@Request() req) {
+    return this.ordersService.findAll(req.user.uid);
   }
 
   @Get(':id')
