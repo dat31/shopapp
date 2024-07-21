@@ -17,6 +17,7 @@ import { FirebaseAdminModule } from './firebase-admin/firebase-admin.module';
   imports: [
     ConfigModule.forRoot({
       envFilePath: ['.env.dev'],
+      isGlobal: true,
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',

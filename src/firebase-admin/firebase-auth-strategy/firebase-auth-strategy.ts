@@ -1,28 +1,22 @@
-import { UnauthorizedException } from '@nestjs/common';
 import { PassportStrategy } from '@nestjs/passport';
-import { ExtractJwt, Strategy } from 'passport-firebase-jwt';
-import admin from 'firebase-admin';
+import { Strategy, ExtractJwt } from 'passport-jwt';
+import { DecodedIdToken } from 'firebase-admin/lib/auth';
 
-export class FirebaseAuthStrategy extends PassportStrategy(
-  Strategy,
-  'firebase-auth',
-) {
+export class FirebaseAuthStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: process.env.JWT_KEY,
+      ignoreExpiration: false,
+      algorithms: ['RS256'],
     });
   }
 
-  async validate(token: string) {
-    try {
-      const user = await admin.auth().verifyIdToken(token, true);
-      if (!user) {
-        throw new UnauthorizedException();
-      }
-      return user;
-    } catch (e) {
-      console.log('auth error', e);
-      throw new UnauthorizedException();
-    }
+  async validate(user: DecodedIdToken) {
+    console.log('validate', user.firebase);
+    return {
+      ...user,
+      uid: user.sub,
+    };
   }
 }

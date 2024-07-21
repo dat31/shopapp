@@ -14,8 +14,12 @@ import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { CreateOrderItemDto } from 'routes/orderitems/dto/create-orderitem.dto';
-import { FirebaseAuth } from 'firebase-admin/firebase-auth.decorator';
-import { GetCreatorInterceptor } from './get-creator.interceptor';
+import {
+  FirebaseAuth,
+  GetFirebaseUser,
+} from 'firebase-admin/firebase-auth.decorator';
+import { GetFirebaseUserInterceptor } from '../../firebase-admin/get-firebase-user.interceptor';
+import { Order } from './entities/order.entity';
 
 @Controller('orders')
 export class OrdersController {
@@ -27,13 +31,17 @@ export class OrdersController {
     return this.ordersService.create(req.user?.uid, createOrderDto);
   }
 
-  @UseInterceptors(GetCreatorInterceptor)
+  @GetFirebaseUser(GetFirebaseUserInterceptor.ARRAY, 'creator')
+  @UseInterceptors(GetFirebaseUserInterceptor<Order[]>)
   @FirebaseAuth()
   @Get()
   findAll(@Request() req) {
     return this.ordersService.findAll(req.user.uid);
   }
 
+  @GetFirebaseUser(GetFirebaseUserInterceptor.OBJECT, 'creator')
+  @UseInterceptors(GetFirebaseUserInterceptor)
+  @FirebaseAuth()
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.ordersService.findOne(+id);

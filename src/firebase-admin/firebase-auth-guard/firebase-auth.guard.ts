@@ -1,28 +1,37 @@
-import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { Observable } from 'rxjs';
+import { FirebaseAdminService } from 'firebase-admin/firebase-admin.service';
 
 @Injectable()
-export class FirebaseAuthGuard
-  extends AuthGuard('firebase-auth')
-  implements CanActivate
-{
-  constructor(private readonly reflector: Reflector) {
+export class FirebaseAuthGuard extends AuthGuard('jwt') implements CanActivate {
+  constructor(
+    private readonly reflector: Reflector,
+    private readonly firebaseService: FirebaseAdminService,
+  ) {
     super();
   }
 
-  canActivate(
-    context: ExecutionContext,
-  ): boolean | Promise<boolean> | Observable<boolean> {
+  async canActivate(context: ExecutionContext): Promise<any> {
     const isAuth = this.reflector.getAllAndOverride<boolean>('firebase-auth', [
       context.getHandler(),
       context.getClass(),
     ]);
-    console.log('isAuth', isAuth);
     if (!isAuth) {
       return true;
     }
     return super.canActivate(context);
+  }
+
+  handleRequest<TUser = any>(err: any, user: any): TUser {
+    if (err || !user) {
+      throw err || new UnauthorizedException();
+    }
+    return user;
   }
 }

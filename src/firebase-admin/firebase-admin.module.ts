@@ -6,10 +6,11 @@ import { PassportModule } from '@nestjs/passport';
 import { FirebaseAuthStrategy } from './firebase-auth-strategy/firebase-auth-strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { FirebaseAuthGuard } from './firebase-auth-guard/firebase-auth.guard';
+import { JwtModule } from '@nestjs/jwt';
 
 @Global()
 @Module({
-  imports: [PassportModule.register({ defaultStrategy: 'firebase-jwt' })],
+  imports: [PassportModule, JwtModule],
   providers: [
     FirebaseAdminService,
     FirebaseAuthStrategy,
@@ -23,14 +24,14 @@ import { FirebaseAuthGuard } from './firebase-auth-guard/firebase-auth.guard';
 export class FirebaseAdminModule implements OnApplicationBootstrap {
   onApplicationBootstrap() {
     admin.initializeApp({
-      credential: admin.credential.cert(
-        JSON.parse(
+      credential: admin.credential.cert({
+        ...JSON.parse(
           readFileSync(
             __dirname.concat('/../service-account-key.json'),
             'utf-8',
           ),
         ),
-      ),
+      }),
     });
   }
 }
