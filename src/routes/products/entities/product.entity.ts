@@ -1,4 +1,5 @@
 import { Category } from 'routes/categories/entities/category.entity';
+import { User } from 'routes/users/entities/user.entity';
 import {
   Column,
   DeleteDateColumn,
@@ -15,8 +16,14 @@ export class Product {
   @Column()
   name: string;
 
+  @Column({ nullable: true })
+  imageUrl: string;
+
   @ManyToOne(() => Category, (cat) => cat.products)
   category: Category;
+
+  @ManyToOne(() => User, (user) => user.products)
+  user: User;
 
   @Column({ type: 'decimal', nullable: true })
   price: number;

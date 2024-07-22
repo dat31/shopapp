@@ -2,6 +2,7 @@ import { EmployeeSchedule } from 'routes/employee-schedules/entities/employee-sc
 import { Order } from 'routes/orders/entities/order.entity';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
 import { DecodedIdToken } from 'firebase-admin/lib/auth';
+import { Product } from 'routes/products/entities/product.entity';
 
 export enum Role {
   ADMIN = 'ADMIN',
@@ -49,6 +50,9 @@ export class User extends FirebaseUser {
 
   @OneToMany(() => User, (u) => u.owner)
   employees: User[];
+
+  @OneToMany(() => Product, (product) => product.user)
+  products: Product[];
 
   @ManyToOne(() => User, (u) => u.employees)
   owner: User;

@@ -6,8 +6,9 @@ import { Product } from './entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { SocketService } from 'socket/socket.service';
 import { Category } from 'routes/categories/entities/category.entity';
-import { isEqual } from 'lodash';
 import { FirebaseAdminService } from 'firebase-admin/firebase-admin.service';
+import { S3Service } from 's3/s3.service';
+import { User } from 'routes/users/entities/user.entity';
 
 @Injectable()
 export class ProductsService {
@@ -17,9 +18,10 @@ export class ProductsService {
 
     private socketService: SocketService,
     private firebaseAdminService: FirebaseAdminService,
+    private s3Service: S3Service,
   ) {}
 
-  async create({ category, ...body }: CreateProductDto) {
+  async create(uid: User['uid'], { category, ...body }: CreateProductDto) {
     const prod = {
       ...new Product(),
       ...body,
@@ -30,27 +32,14 @@ export class ProductsService {
       });
       prod.category = prodCategory as any;
     }
+    prod.user.uid = uid;
     return this.prodRepo.save(prod);
   }
 
   async findAll() {
-    const products = await this.prodRepo.find({
+    return this.prodRepo.find({
       relations: { category: true },
     });
-
-    const categories = products.reduce((acc, product) => {
-      if (acc.find((category) => isEqual(category, product.category))) {
-        return acc;
-      }
-      return [...acc, product.category];
-    }, []);
-
-    return categories.map((category) => ({
-      ...category,
-      products: products.filter((product) =>
-        isEqual(product.category, category),
-      ),
-    }));
   }
 
   findOne(id: number) {

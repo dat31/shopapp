@@ -8,6 +8,7 @@ import {
   Delete,
   UseInterceptors,
   UploadedFile,
+  Request,
 } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
@@ -15,6 +16,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { S3Service } from 's3/s3.service';
 import { FirebaseAuth } from 'firebase-admin/firebase-auth.decorator';
+import { GetS3SignedUrlInterceptor } from 's3/get-s3-signed-url.interceptor';
 
 @Controller('products')
 export class ProductsController {
@@ -25,24 +27,21 @@ export class ProductsController {
 
   @FirebaseAuth()
   @Post()
-  @UseInterceptors(FileInterceptor('file'))
-  create(
-    @Body() createProductDto: CreateProductDto,
-    @UploadedFile() file: Express.Multer.File,
-  ) {
-    console.log(file);
-    return this.productsService.create(createProductDto);
+  create(@Request() req, @Body() createProductDto: CreateProductDto) {
+    return this.productsService.create(req.user.uid, createProductDto);
   }
 
-  @Post('/upload')
-  @UseInterceptors(FileInterceptor('file'))
-  uploadFile(@UploadedFile() file: Express.Multer.File) {
-    return this.s3Service.uploadFile(file);
+  @FirebaseAuth()
+  @Post('/upload/image')
+  @UseInterceptors(FileInterceptor('image'))
+  uploadImage(@Request() req, @UploadedFile() file: Express.Multer.File) {
+    return this.s3Service.uploadFile(req.user.uid, file);
   }
 
+  @FirebaseAuth()
+  @UseInterceptors(GetS3SignedUrlInterceptor)
   @Get()
   findAll() {
-    console.log('get all');
     return this.productsService.findAll();
   }
 
