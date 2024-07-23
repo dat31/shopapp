@@ -41,10 +41,12 @@ export class ProductsController {
   @FirebaseAuth()
   @UseInterceptors(GetS3SignedUrlInterceptor)
   @Get()
-  findAll() {
-    return this.productsService.findAll();
+  findAll(@Request() req) {
+    return this.productsService.findAll(req.user.uid);
   }
 
+  @FirebaseAuth()
+  @UseInterceptors(GetS3SignedUrlInterceptor)
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.productsService.findOne(+id);

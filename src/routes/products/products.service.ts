@@ -32,13 +32,18 @@ export class ProductsService {
       });
       prod.category = prodCategory as any;
     }
-    prod.user.uid = uid;
+    prod.user = { uid } as User;
     return this.prodRepo.save(prod);
   }
 
-  async findAll() {
+  async findAll(uid: User['uid']) {
     return this.prodRepo.find({
       relations: { category: true },
+      where: {
+        user: {
+          owner: { uid },
+        },
+      },
     });
   }
 

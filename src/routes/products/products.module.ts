@@ -7,6 +7,7 @@ import { Category } from 'routes/categories/entities/category.entity';
 import { ConfigModule } from '@nestjs/config';
 import { OrderItem } from 'routes/orderitems/entities/orderitem.entity';
 import { SocketModule } from 'socket/socket.module';
+import { ProductsSubscriber } from './products.subscriber';
 
 @Module({
   imports: [
@@ -15,7 +16,7 @@ import { SocketModule } from 'socket/socket.module';
     SocketModule,
   ],
   controllers: [ProductsController],
-  providers: [ProductsService],
+  providers: [ProductsService, ProductsSubscriber],
   exports: [ProductsService],
 })
 export class ProductsModule {}

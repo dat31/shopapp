@@ -4,10 +4,11 @@ import {
   Injectable,
   NestInterceptor,
 } from '@nestjs/common';
-import { from, map, Observable, of, switchMap } from 'rxjs';
+import { from, Observable, of, switchMap } from 'rxjs';
 import { S3Service } from './s3.service';
 import { Product } from 'routes/products/entities/product.entity';
-import { isEqual } from 'lodash';
+import { isArray } from 'lodash';
+import { User } from 'routes/users/entities/user.entity';
 
 @Injectable()
 export class GetS3SignedUrlInterceptor implements NestInterceptor {
@@ -16,38 +17,26 @@ export class GetS3SignedUrlInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     const { uid } = context.switchToHttp().getRequest().user;
     return next.handle().pipe(
-      switchMap((data: Product[]) => {
+      switchMap((data: Product[] | Product) => {
         if (!data) {
           return of(data);
         }
-        const promises = data.map(({ imageUrl, ...product }) => {
-          if (!imageUrl) {
-            return product;
-          }
-          return this.s3Service
-            .getSignedUrl(uid, imageUrl)
-            .then((url) => ({ ...product, imageUrl: url }));
-        });
-        return from(Promise.all(promises));
-      }),
-      map((data) => {
-        const categories = data.reduce((acc, product) => {
-          if (
-            acc.findIndex((category) => isEqual(category, product.category)) !==
-            -1
-          ) {
-            return acc;
-          }
-          return [...acc, product.category];
-        }, []);
-
-        return categories.map((category) => ({
-          ...category,
-          products: data.filter((product) =>
-            isEqual(product.category, category),
-          ),
-        }));
+        if (isArray(data)) {
+          const promises = data.map((product) =>
+            this.getProductImageUrl(uid, product),
+          );
+          return from(Promise.all(promises));
+        }
+        return this.getProductImageUrl(uid, data);
       }),
     );
+  }
+
+  private async getProductImageUrl(uid: User['uid'], product: Product) {
+    if (!product.imageUrl) {
+      return product;
+    }
+    const url = await this.s3Service.getSignedUrl(uid, product.imageUrl);
+    return { ...product, imageUrl: url };
   }
 }

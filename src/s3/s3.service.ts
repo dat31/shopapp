@@ -1,4 +1,5 @@
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
@@ -30,6 +31,22 @@ export class S3Service {
       }),
     );
     return fileName;
+  }
+
+  async deleteFile(uid: User['uid'], fileName: string) {
+    const bucket = this.configService.get('S3_BUCKET');
+    const key = `${uid}/${fileName}`;
+    console.log('DELETE S3');
+    return this.s3Client
+      .send(
+        new DeleteObjectCommand({
+          Bucket: bucket,
+          Key: key,
+        }),
+      )
+      .then((v) => {
+        console.log(v);
+      });
   }
 
   getSignedUrl(uid: User['uid'], fileName: string) {
