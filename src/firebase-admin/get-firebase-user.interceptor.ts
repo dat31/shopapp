@@ -39,7 +39,8 @@ export class GetFirebaseUserInterceptor<T> implements NestInterceptor<T> {
 
         if (type === GetFirebaseUserInterceptor.OBJECT) {
           return from(
-            this.firebaseAdminService.auth
+            this.firebaseAdminService
+              .auth()
               .getUser(data[key].uid)
               .then((user) => ({ ...data, [key]: user })),
           );
@@ -48,7 +49,8 @@ export class GetFirebaseUserInterceptor<T> implements NestInterceptor<T> {
         return from(
           Promise.all(
             data.map((data: T) =>
-              this.firebaseAdminService.auth
+              this.firebaseAdminService
+                .auth()
                 .getUser(data[key].uid)
                 .then((user) => ({ ...data, [key]: user })),
             ),

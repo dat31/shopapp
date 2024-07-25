@@ -3,17 +3,20 @@ import { FirebaseAdminService } from './firebase-admin.service';
 import admin from 'firebase-admin';
 import { readFileSync } from 'fs';
 import { PassportModule } from '@nestjs/passport';
-import { FirebaseAuthStrategy } from './firebase-auth-strategy/firebase-auth-strategy';
+import { JwtStrategy } from './jwt-strategy';
 import { APP_GUARD } from '@nestjs/core';
-import { FirebaseAuthGuard } from './firebase-auth-guard/firebase-auth.guard';
+import { FirebaseAuthGuard } from './firebase-auth.guard';
 import { JwtModule } from '@nestjs/jwt';
 
 @Global()
 @Module({
-  imports: [PassportModule, JwtModule],
+  imports: [
+    PassportModule,
+    JwtModule.register({ secret: process.env.JWT_KEY }),
+  ],
   providers: [
     FirebaseAdminService,
-    FirebaseAuthStrategy,
+    JwtStrategy,
     {
       provide: APP_GUARD,
       useClass: FirebaseAuthGuard,

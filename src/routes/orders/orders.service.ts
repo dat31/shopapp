@@ -43,12 +43,6 @@ export class OrdersService {
   }
 
   async findAll(userUid: User['uid']) {
-    this.firebaseAdminService.auth
-      .getUser('Cj5f0Fpb4zRHk8yJL11Br3RQS9m1')
-      .then((yser) => {
-        console.log(yser);
-      });
-
     const orders = await this.odRepo.find({
       where: [
         { creator: { uid: userUid } },

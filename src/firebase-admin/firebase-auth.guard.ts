@@ -6,14 +6,10 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { AuthGuard } from '@nestjs/passport';
-import { FirebaseAdminService } from 'firebase-admin/firebase-admin.service';
 
 @Injectable()
 export class FirebaseAuthGuard extends AuthGuard('jwt') implements CanActivate {
-  constructor(
-    private readonly reflector: Reflector,
-    private readonly firebaseService: FirebaseAdminService,
-  ) {
+  constructor(private readonly reflector: Reflector) {
     super();
   }
 

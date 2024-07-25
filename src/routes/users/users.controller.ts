@@ -27,9 +27,10 @@ export class UsersController {
     return this.usersService.findSchedules(id);
   }
 
+  @FirebaseAuth()
   @Get('/employees')
   findEmployees(@Request() req) {
-    return this.usersService.findEmployees(req.user.id);
+    return this.usersService.findEmployees(req.user.uid);
   }
 
   @FirebaseAuth()
@@ -38,31 +39,21 @@ export class UsersController {
     return req.user;
   }
 
-  // @Auth()
   @Post('/employees')
   createEmployees(@Request() req, @Body() dto: CreateUserDto) {
     return this.usersService.createEmployee(dto, req.user.id);
   }
 
-  // @Auth()
   @Delete('/employees/:id')
   deleteEmployee(@Request() req, @Param('id') id: string) {
     return this.usersService.removeEmployee(id, req.user.id);
   }
 
-  // @Auth()
   @Get('/employees/:id')
   findEmployeeDetail(@Request() req, @Param('id') id: string) {
-    return this.usersService.findEmployeeDetail(id, req.user.id);
+    return this.usersService.findEmployeeDetail(id, req.user.uid);
   }
 
-  //TODO: delete in prod
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(id);
-  }
-
-  // @Auth()
   @Patch('/employees/:id')
   updateEmployee(
     @Param('id') id: string,

@@ -39,9 +39,10 @@ export class ProductsController {
   }
 
   @FirebaseAuth()
-  @UseInterceptors(GetS3SignedUrlInterceptor)
+  // @UseInterceptors(GetS3SignedUrlInterceptor)
   @Get()
   findAll(@Request() req) {
+    console.log('findAll', req);
     return this.productsService.findAll(req.user.uid);
   }
 

@@ -2,7 +2,7 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Strategy, ExtractJwt } from 'passport-jwt';
 import { DecodedIdToken } from 'firebase-admin/lib/auth';
 
-export class FirebaseAuthStrategy extends PassportStrategy(Strategy) {
+export class JwtStrategy extends PassportStrategy(Strategy) {
   constructor() {
     super({
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
@@ -13,7 +13,6 @@ export class FirebaseAuthStrategy extends PassportStrategy(Strategy) {
   }
 
   async validate(user: DecodedIdToken) {
-    console.log('validate', user.firebase);
     return {
       ...user,
       uid: user.sub,

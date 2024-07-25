@@ -1,7 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { Repository } from 'typeorm';
+import { Not, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EmployeeSchedulesService } from 'routes/employee-schedules/employee-schedules.service';
@@ -43,7 +43,7 @@ export class UsersService {
 
   findEmployees(uid: User['uid']) {
     return this.userRepo.find({
-      where: { owner: { uid } },
+      where: { owner: { uid }, uid: Not(uid) },
     });
   }
 
@@ -65,11 +65,8 @@ export class UsersService {
     return this.userRepo.save(updateUserDto);
   }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return this.userRepo.save({
-      id,
-      ...updateUserDto,
-    });
+  update(updateUserDto: UpdateUserDto) {
+    return this.userRepo.save(updateUserDto);
   }
 
   removeEmployee(uid: string, ownerId: string) {

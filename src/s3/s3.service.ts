@@ -37,16 +37,12 @@ export class S3Service {
     const bucket = this.configService.get('S3_BUCKET');
     const key = `${uid}/${fileName}`;
     console.log('DELETE S3');
-    return this.s3Client
-      .send(
-        new DeleteObjectCommand({
-          Bucket: bucket,
-          Key: key,
-        }),
-      )
-      .then((v) => {
-        console.log(v);
-      });
+    return this.s3Client.send(
+      new DeleteObjectCommand({
+        Bucket: bucket,
+        Key: key,
+      }),
+    );
   }
 
   getSignedUrl(uid: User['uid'], fileName: string) {

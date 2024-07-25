@@ -12,6 +12,8 @@ import { EmployeeSchedulesModule } from 'routes/employee-schedules/employee-sche
 import { SocketModule } from './socket/socket.module';
 import { S3Module } from './s3/s3.module';
 import { FirebaseAdminModule } from './firebase-admin/firebase-admin.module';
+import { AppController } from 'app.controller';
+import { AppService } from 'app.service';
 
 @Module({
   imports: [
@@ -41,5 +43,7 @@ import { FirebaseAdminModule } from './firebase-admin/firebase-admin.module';
     S3Module,
     FirebaseAdminModule,
   ],
+  controllers: [AppController],
+  providers: [AppService],
 })
 export class AppModule {}
