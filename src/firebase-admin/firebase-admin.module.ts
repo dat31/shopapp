@@ -10,10 +10,7 @@ import { JwtModule } from '@nestjs/jwt';
 
 @Global()
 @Module({
-  imports: [
-    PassportModule,
-    JwtModule.register({ secret: process.env.JWT_KEY }),
-  ],
+  imports: [PassportModule, JwtModule],
   providers: [
     FirebaseAdminService,
     JwtStrategy,
@@ -27,6 +24,7 @@ import { JwtModule } from '@nestjs/jwt';
 export class FirebaseAdminModule implements OnApplicationBootstrap {
   onApplicationBootstrap() {
     admin.initializeApp({
+      storageBucket: 'gs://shopapp-407104.appspot.com',
       credential: admin.credential.cert({
         ...JSON.parse(
           readFileSync(

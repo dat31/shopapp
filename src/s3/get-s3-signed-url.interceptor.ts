@@ -33,6 +33,7 @@ export class GetS3SignedUrlInterceptor implements NestInterceptor {
   }
 
   private async getProductImageUrl(uid: User['uid'], product: Product) {
+    console.log(product.imageUrl);
     if (!product.imageUrl) {
       return product;
     }

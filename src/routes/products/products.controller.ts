@@ -32,14 +32,7 @@ export class ProductsController {
   }
 
   @FirebaseAuth()
-  @Post('/upload/image')
-  @UseInterceptors(FileInterceptor('image'))
-  uploadImage(@Request() req, @UploadedFile() file: Express.Multer.File) {
-    return this.s3Service.uploadFile(req.user.uid, file);
-  }
-
-  @FirebaseAuth()
-  // @UseInterceptors(GetS3SignedUrlInterceptor)
+  @UseInterceptors(GetS3SignedUrlInterceptor)
   @Get()
   findAll(@Request() req) {
     console.log('findAll', req);
