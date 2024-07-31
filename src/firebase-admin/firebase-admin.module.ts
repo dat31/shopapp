@@ -7,6 +7,7 @@ import { JwtStrategy } from './jwt-strategy';
 import { APP_GUARD } from '@nestjs/core';
 import { FirebaseAuthGuard } from './firebase-auth.guard';
 import { JwtModule } from '@nestjs/jwt';
+import { ConfigService } from '@nestjs/config';
 
 @Global()
 @Module({
@@ -22,17 +23,19 @@ import { JwtModule } from '@nestjs/jwt';
   exports: [FirebaseAdminService],
 })
 export class FirebaseAdminModule implements OnApplicationBootstrap {
+  constructor(private configService: ConfigService) {}
+
   onApplicationBootstrap() {
     admin.initializeApp({
-      storageBucket: 'gs://shopapp-407104.appspot.com',
-      credential: admin.credential.cert({
-        ...JSON.parse(
+      storageBucket: this.configService.get('FIREBASE_STORAGE'),
+      credential: admin.credential.cert(
+        JSON.parse(
           readFileSync(
             __dirname.concat('/../service-account-key.json'),
             'utf-8',
           ),
         ),
-      }),
+      ),
     });
   }
 }

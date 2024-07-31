@@ -5,6 +5,7 @@ import { Category } from './entities/category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { Product } from 'routes/products/entities/product.entity';
+import { User } from 'routes/users/entities/user.entity';
 
 @Injectable()
 export class CategoriesService {
@@ -13,8 +14,8 @@ export class CategoriesService {
     @InjectRepository(Product) private prodRepo: Repository<Product>,
   ) {}
 
-  async create({ name }: CreateCategoryDto) {
-    return this.catRepo.save({ ...new Category(), name });
+  async create({ name }: CreateCategoryDto, uid: User['uid']) {
+    return this.catRepo.save({ ...new Category(), name, user: { uid } });
   }
 
   findAll() {

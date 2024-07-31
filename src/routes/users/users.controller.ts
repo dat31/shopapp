@@ -7,11 +7,16 @@ import {
   Param,
   Delete,
   Request,
+  UseInterceptors,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { FirebaseAuth } from 'firebase-admin/firebase-auth.decorator';
+import {
+  FirebaseAuth,
+  GetFirebaseUser,
+} from 'firebase-admin/firebase-auth.decorator';
+import { GetFirebaseUserInterceptor } from 'firebase-admin/get-firebase-user.interceptor';
 
 @Controller('users')
 export class UsersController {
@@ -27,6 +32,8 @@ export class UsersController {
     return this.usersService.findSchedules(id);
   }
 
+  @GetFirebaseUser(GetFirebaseUserInterceptor.ARRAY)
+  @UseInterceptors(GetFirebaseUserInterceptor)
   @FirebaseAuth()
   @Get('/employees')
   findEmployees(@Request() req) {
@@ -49,17 +56,21 @@ export class UsersController {
     return this.usersService.removeEmployee(id, req.user.id);
   }
 
-  @Get('/employees/:id')
-  findEmployeeDetail(@Request() req, @Param('id') id: string) {
-    return this.usersService.findEmployeeDetail(id, req.user.uid);
+  @GetFirebaseUser(GetFirebaseUserInterceptor.OBJECT)
+  @UseInterceptors(GetFirebaseUserInterceptor)
+  @FirebaseAuth()
+  @Get('/employees/:uid')
+  findEmployeeDetail(@Request() req, @Param('uid') uid: string) {
+    return this.usersService.findEmployeeDetail(uid, req.user.uid);
   }
 
-  @Patch('/employees/:id')
-  updateEmployee(
+  @FirebaseAuth()
+  @Patch('/:id')
+  update(
     @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
     @Request() req,
   ) {
-    return this.usersService.updateEmployee(id, updateUserDto, req.user.id);
+    return this.usersService.update(id, updateUserDto, req.user.id);
   }
 }

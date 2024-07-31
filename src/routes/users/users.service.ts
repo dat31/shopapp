@@ -6,12 +6,15 @@ import { User } from './entities/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { EmployeeSchedulesService } from 'routes/employee-schedules/employee-schedules.service';
 import { assign } from 'lodash';
+import { FirebaseAdminService } from 'firebase-admin/firebase-admin.service';
+import { UpdateRequest } from 'firebase-admin/auth';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly userRepo: Repository<User>,
     private scheduleService: EmployeeSchedulesService,
+    private adminService: FirebaseAdminService,
   ) {}
 
   async create(createUserDto: CreateUserDto) {
@@ -19,7 +22,7 @@ export class UsersService {
   }
 
   async createEmployee(createUserDto: CreateUserDto, ownerId: string) {
-    const owner = this.userRepo.findOne({ where: { uid: ownerId } });
+    const owner = await this.userRepo.findOne({ where: { uid: ownerId } });
     const employee = assign(new User(), {
       ...createUserDto,
       owner,
@@ -53,7 +56,7 @@ export class UsersService {
     });
   }
 
-  async updateEmployee(
+  async update(
     uid: string,
     updateUserDto: UpdateUserDto,
     ownerId: User['uid'],
@@ -62,11 +65,11 @@ export class UsersService {
     if (!owner) {
       throw new NotFoundException();
     }
-    return this.userRepo.save(updateUserDto);
-  }
-
-  update(updateUserDto: UpdateUserDto) {
-    return this.userRepo.save(updateUserDto);
+    if ((updateUserDto as User).role) {
+    }
+    return this.adminService
+      .auth()
+      .updateUser(uid, updateUserDto as UpdateRequest);
   }
 
   removeEmployee(uid: string, ownerId: string) {

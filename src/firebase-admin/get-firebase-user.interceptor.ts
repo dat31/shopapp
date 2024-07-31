@@ -5,7 +5,7 @@ import {
   NestInterceptor,
 } from '@nestjs/common';
 import { FirebaseAdminService } from 'firebase-admin/firebase-admin.service';
-import { from, Observable, of, switchMap } from 'rxjs';
+import { from, map, Observable, of, switchMap } from 'rxjs';
 import { Reflector } from '@nestjs/core';
 
 @Injectable()
@@ -29,8 +29,6 @@ export class GetFirebaseUserInterceptor<T> implements NestInterceptor<T> {
       [context.getHandler(), context.getClass()],
     );
 
-    console.log(type, key);
-
     return next.handle().pipe(
       switchMap((data) => {
         if (!data) {
@@ -41,20 +39,33 @@ export class GetFirebaseUserInterceptor<T> implements NestInterceptor<T> {
           return from(
             this.firebaseAdminService
               .auth()
-              .getUser(data[key].uid)
-              .then((user) => ({ ...data, [key]: user })),
+              .getUser(key ? data[key].uid : data.uid)
+              .then((user) => (key ? { ...data, [key]: user } : user)),
           );
         }
 
+        const extractedData = data?.data ? data.data : data;
+
         return from(
           Promise.all(
-            data.map((data: T) =>
+            extractedData.map((e: T) =>
               this.firebaseAdminService
                 .auth()
-                .getUser(data[key].uid)
-                .then((user) => ({ ...data, [key]: user })),
+                .getUser(key ? e[key].uid : (e as any).uid)
+                .then((user) => (key ? { ...e, [key]: user } : user)),
             ),
           ),
+        ).pipe(
+          map((res) => {
+            if (data.data) {
+              return {
+                data: res,
+                ...data,
+              };
+            }
+
+            return res;
+          }),
         );
       }),
     );

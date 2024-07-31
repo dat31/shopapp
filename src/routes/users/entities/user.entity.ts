@@ -1,36 +1,16 @@
 import { EmployeeSchedule } from 'routes/employee-schedules/entities/employee-schedule.entity';
 import { Order } from 'routes/orders/entities/order.entity';
 import { Column, Entity, ManyToOne, OneToMany, PrimaryColumn } from 'typeorm';
-import { DecodedIdToken } from 'firebase-admin/lib/auth';
 import { Product } from 'routes/products/entities/product.entity';
+import { Category } from 'routes/categories/entities/category.entity';
 
 export enum Role {
   ADMIN = 'ADMIN',
   CUSTOMER = 'CUSTOMER',
 }
 
-class FirebaseUser implements DecodedIdToken {
-  aud: string;
-  auth_time: number;
-  email?: string;
-  email_verified?: boolean;
-  exp: number;
-  firebase: {
-    [key: string]: any;
-    identities: { [key: string]: any };
-    sign_in_provider: string;
-    sign_in_second_factor?: string;
-    second_factor_identifier?: string;
-    tenant?: string;
-  };
-  sub: string;
-  iat: number;
-  iss: string;
-  uid: string;
-}
-
 @Entity()
-export class User extends FirebaseUser {
+export class User {
   @PrimaryColumn()
   uid: string; //firebase uid
 
@@ -56,4 +36,7 @@ export class User extends FirebaseUser {
 
   @ManyToOne(() => User, (u) => u.employees)
   owner: User;
+
+  @OneToMany(() => Category, (category) => category.user)
+  categories: Category[];
 }

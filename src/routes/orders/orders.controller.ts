@@ -20,6 +20,7 @@ import {
 } from 'firebase-admin/firebase-auth.decorator';
 import { GetFirebaseUserInterceptor } from '../../firebase-admin/get-firebase-user.interceptor';
 import { Order } from './entities/order.entity';
+import { FilterOrderDto } from './dto/filter-order.dto';
 
 @Controller('orders')
 export class OrdersController {
@@ -34,9 +35,9 @@ export class OrdersController {
   @GetFirebaseUser(GetFirebaseUserInterceptor.ARRAY, 'creator')
   @UseInterceptors(GetFirebaseUserInterceptor<Order[]>)
   @FirebaseAuth()
-  @Get()
-  findAll(@Request() req) {
-    return this.ordersService.findAll(req.user.uid);
+  @Post('/filter')
+  filter(@Request() req, @Body() filter: FilterOrderDto) {
+    return this.ordersService.filter(req.user.uid, filter);
   }
 
   @GetFirebaseUser(GetFirebaseUserInterceptor.OBJECT, 'creator')

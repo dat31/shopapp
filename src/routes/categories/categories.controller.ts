@@ -6,7 +6,10 @@ import {
   Patch,
   Param,
   Delete,
+  Req,
+  Request,
 } from '@nestjs/common';
+import { FirebaseAuth } from 'firebase-admin/firebase-auth.decorator';
 import { CategoriesService } from 'routes/categories/categories.service';
 import { CreateCategoryDto } from 'routes/categories/dto/create-category.dto';
 import { UpdateCategoryDto } from 'routes/categories/dto/update-category.dto';
@@ -15,9 +18,10 @@ import { UpdateCategoryDto } from 'routes/categories/dto/update-category.dto';
 export class CategoriesController {
   constructor(private readonly categoriesService: CategoriesService) {}
 
+  @FirebaseAuth()
   @Post()
-  create(@Body() createCategoryDto: CreateCategoryDto) {
-    return this.categoriesService.create(createCategoryDto);
+  create(@Body() createCategoryDto: CreateCategoryDto, @Request() req) {
+    return this.categoriesService.create(createCategoryDto, req.user.uid);
   }
 
   @Get('/products')

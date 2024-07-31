@@ -1,5 +1,12 @@
 import { Product } from 'routes/products/entities/product.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { User } from 'routes/users/entities/user.entity';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity()
 export class Category {
@@ -11,4 +18,7 @@ export class Category {
 
   @OneToMany(() => Product, (prod) => prod.category)
   products: Product[];
+
+  @ManyToOne(() => User, (user) => user.categories)
+  user: User;
 }

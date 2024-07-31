@@ -1,15 +1,17 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { OrderItemService } from 'routes/orderitems/orderitems.service';
 import { Order, Status } from './entities/order.entity';
-import { Repository } from 'typeorm';
+import { Between, Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UsersService } from 'routes/users/users.service';
 import { CreateOrderItemDto } from 'routes/orderitems/dto/create-orderitem.dto';
 import { User } from 'routes/users/entities/user.entity';
 import { assign } from 'lodash';
 import { FirebaseAdminService } from 'firebase-admin/firebase-admin.service';
+import { FilterOrderDto } from './dto/filter-order.dto';
 
 @Injectable()
 export class OrdersService {
@@ -22,17 +24,15 @@ export class OrdersService {
 
   async create(
     creatorId: User['uid'],
-    { orderItems, ...data }: CreateOrderDto,
+    { items = [], creator, ...data }: CreateOrderDto,
   ) {
-    const order = assign(new Order(), data);
+    const order = assign(new Order(), { items, ...data });
     order.orderDate = data.orderDate ? new Date(data.orderDate) : new Date();
-    order.creator = { uid: creatorId } as User;
+    order.creator = { uid: creator.uid } as User;
     const createdOd = await this.odRepo.save(order);
-    if (orderItems) {
+    if (items.length) {
       await Promise.all(
-        orderItems.map((odItem) =>
-          this.odItemService.create(createdOd.id, odItem),
-        ),
+        items.map((odItem) => this.odItemService.create(createdOd.id, odItem)),
       );
     }
     return createdOd;
@@ -55,8 +55,41 @@ export class OrdersService {
         },
       },
     });
-
     return orders;
+  }
+
+  async filter(uid: User['uid'], conditions: FilterOrderDto) {
+    console.log(conditions);
+    const { from, to, status, creator, table, order, page = 0 } = conditions;
+    const skip = page * 20;
+    const [data, total] = await this.odRepo.findAndCount({
+      take: 20,
+      skip,
+      withDeleted: true,
+      where: {
+        ...(from && to
+          ? { orderDate: Between(new Date(from), new Date(to)) }
+          : {}),
+        creator: creator ? { uid: creator.uid } : [{ uid }, { owner: { uid } }],
+        ...(status ? { status } : {}),
+        ...(table ? { table: Like(`%${table.toLocaleLowerCase()}%`) } : {}),
+      },
+      relations: {
+        creator: true,
+        items: {
+          product: { category: true },
+        },
+      },
+      order: order as any,
+    });
+    const next = (page + 1) * 20 > total ? undefined : page + 1;
+    const previous = page === 0 ? undefined : page - 1;
+    return {
+      data,
+      total,
+      next,
+      previous,
+    };
   }
 
   findOne(id: number) {
