@@ -20,7 +20,10 @@ export class User {
   @Column({ type: 'enum', enum: Role, default: Role.CUSTOMER })
   role: Role;
 
-  @OneToMany(() => Order, (order) => order.creator, { nullable: true })
+  @OneToMany(() => Order, (order) => order.creator, {
+    nullable: true,
+    onDelete: 'CASCADE',
+  })
   orders: Order[];
 
   @OneToMany(() => EmployeeSchedule, (schedule) => schedule.employee, {
@@ -31,12 +34,14 @@ export class User {
   @OneToMany(() => User, (u) => u.owner)
   employees: User[];
 
-  @OneToMany(() => Product, (product) => product.user)
+  @OneToMany(() => Product, (product) => product.user, { onDelete: 'CASCADE' })
   products: Product[];
 
   @ManyToOne(() => User, (u) => u.employees)
   owner: User;
 
-  @OneToMany(() => Category, (category) => category.user)
+  @OneToMany(() => Category, (category) => category.user, {
+    onDelete: 'CASCADE',
+  })
   categories: Category[];
 }

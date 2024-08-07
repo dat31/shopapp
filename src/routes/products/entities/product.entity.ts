@@ -19,10 +19,10 @@ export class Product {
   @Column({ nullable: true })
   imageUrl: string;
 
-  @ManyToOne(() => Category, (cat) => cat.products)
+  @ManyToOne(() => Category, (cat) => cat.products, { onDelete: 'CASCADE' })
   category: Category;
 
-  @ManyToOne(() => User, (user) => user.products)
+  @ManyToOne(() => User, (user) => user.products, { onDelete: 'CASCADE' })
   user: User;
 
   @Column({ type: 'decimal', nullable: true })

@@ -16,9 +16,9 @@ export class Category {
   @Column()
   name: string;
 
-  @OneToMany(() => Product, (prod) => prod.category)
+  @OneToMany(() => Product, (prod) => prod.category, { onDelete: 'CASCADE' })
   products: Product[];
 
-  @ManyToOne(() => User, (user) => user.categories)
+  @ManyToOne(() => User, (user) => user.categories, { onDelete: 'CASCADE' })
   user: User;
 }

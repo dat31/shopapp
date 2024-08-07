@@ -45,7 +45,7 @@ export class GetFirebaseUserInterceptor<T> implements NestInterceptor<T> {
         }
 
         const extractedData = data?.data ? data.data : data;
-
+        console.log(extractedData);
         return from(
           Promise.all(
             extractedData.map((e: T) =>

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ProductsModule } from 'routes/products/products.module';
 import { CategoriesModule } from 'routes/categories/categories.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from 'routes/users/users.module';
 import { OrdersModule } from 'routes/orders/orders.module';
 import { OrderitemsModule } from 'routes/orderitems/orderitems.module';
@@ -21,15 +21,21 @@ import { AppService } from 'app.service';
       envFilePath: ['.env.dev'],
       isGlobal: true,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.HOST,
-      port: 5432,
-      username: process.env.DB_USERNAME,
-      password: process.env.DB_PW,
-      database: process.env.DB_NAME,
-      autoLoadEntities: true,
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory(configService: ConfigService) {
+        return {
+          type: 'postgres',
+          host: configService.get('DB_HOST'),
+          port: configService.get('DB_PORT'),
+          username: configService.get('DB_USERNAME'),
+          password: configService.get('DB_PW'),
+          database: configService.get('DB_NAME'),
+          autoLoadEntities: true,
+          synchronize: true,
+        };
+      },
     }),
     ProductsModule,
     CategoriesModule,

@@ -3,7 +3,7 @@ import { CreateCategoryDto } from 'routes/categories/dto/create-category.dto';
 import { UpdateCategoryDto } from 'routes/categories/dto/update-category.dto';
 import { Category } from './entities/category.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { In, Repository } from 'typeorm';
+import { Repository } from 'typeorm';
 import { Product } from 'routes/products/entities/product.entity';
 import { User } from 'routes/users/entities/user.entity';
 
@@ -49,20 +49,4 @@ export class CategoriesService {
   remove(id: number) {
     return this.catRepo.delete(id);
   }
-
-  private findByIds(ids: Category['id'][]) {
-    return this.catRepo.find({
-      where: { id: In(ids) },
-    });
-  }
-
-  // private async insertTree(children: Category[], parent: Category) {
-  //   const savedParent = await this.catRepo.save(parent);
-  //   await Promise.all(
-  //     children
-  //       .map((c) => ({ ...c, parent: savedParent }))
-  //       .map((c) => (c.children ? this.insertTree(c.children, c) : c)),
-  //   );
-  //   return this.catTree.findDescendantsTree(savedParent);
-  // }
 }

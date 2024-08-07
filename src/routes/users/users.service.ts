@@ -44,7 +44,7 @@ export class UsersService {
 
   findEmployeeSchedules() {}
 
-  findEmployees(uid: User['uid']) {
+  async findEmployees(uid: User['uid']) {
     return this.userRepo.find({
       where: { owner: { uid }, uid: Not(uid) },
     });
@@ -66,6 +66,9 @@ export class UsersService {
       throw new NotFoundException();
     }
     if ((updateUserDto as User).role) {
+      await this.adminService
+        .auth()
+        .setCustomUserClaims(uid, { role: (updateUserDto as User).role });
     }
     return this.adminService
       .auth()

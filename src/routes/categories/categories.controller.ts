@@ -6,7 +6,6 @@ import {
   Patch,
   Param,
   Delete,
-  Req,
   Request,
 } from '@nestjs/common';
 import { FirebaseAuth } from 'firebase-admin/firebase-auth.decorator';

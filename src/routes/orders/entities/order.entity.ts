@@ -27,7 +27,7 @@ export class Order {
   })
   items: OrderItem[];
 
-  @ManyToOne(() => User, { eager: true })
+  @ManyToOne(() => User, { eager: true, onDelete: 'CASCADE' })
   creator: User;
 
   @Column({ type: 'enum', enum: Status, default: Status.CREATED })

@@ -11,7 +11,7 @@ import { isArray } from 'lodash';
 import { User } from 'routes/users/entities/user.entity';
 
 @Injectable()
-export class GetS3SignedUrlInterceptor implements NestInterceptor {
+export class GetS3SignedUrlInterceptor<T> implements NestInterceptor<T> {
   constructor(private readonly s3Service: S3Service) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {

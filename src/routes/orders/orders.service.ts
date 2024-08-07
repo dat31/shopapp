@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -6,20 +5,18 @@ import { OrderItemService } from 'routes/orderitems/orderitems.service';
 import { Order, Status } from './entities/order.entity';
 import { Between, Like, Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
-import { UsersService } from 'routes/users/users.service';
 import { CreateOrderItemDto } from 'routes/orderitems/dto/create-orderitem.dto';
 import { User } from 'routes/users/entities/user.entity';
 import { assign } from 'lodash';
-import { FirebaseAdminService } from 'firebase-admin/firebase-admin.service';
 import { FilterOrderDto } from './dto/filter-order.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class OrdersService {
   constructor(
     @InjectRepository(Order) private odRepo: Repository<Order>,
     private odItemService: OrderItemService,
-    private userService: UsersService,
-    private firebaseAdminService: FirebaseAdminService,
+    private configService: ConfigService,
   ) {}
 
   async create(
@@ -59,11 +56,11 @@ export class OrdersService {
   }
 
   async filter(uid: User['uid'], conditions: FilterOrderDto) {
-    console.log(conditions);
+    const take = this.configService.get('PAGINATION_TAKE');
     const { from, to, status, creator, table, order, page = 0 } = conditions;
-    const skip = page * 20;
+    const skip = page * take;
     const [data, total] = await this.odRepo.findAndCount({
-      take: 20,
+      take,
       skip,
       withDeleted: true,
       where: {
@@ -82,7 +79,7 @@ export class OrdersService {
       },
       order: order as any,
     });
-    const next = (page + 1) * 20 > total ? undefined : page + 1;
+    const next = (page + 1) * take > total ? undefined : page + 1;
     const previous = page === 0 ? undefined : page - 1;
     return {
       data,

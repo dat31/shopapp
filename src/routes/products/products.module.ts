@@ -8,12 +8,14 @@ import { ConfigModule } from '@nestjs/config';
 import { OrderItem } from 'routes/orderitems/entities/orderitem.entity';
 import { SocketModule } from 'socket/socket.module';
 import { ProductsSubscriber } from './products.subscriber';
+import { UsersModule } from 'routes/users/users.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Product, Category, OrderItem]),
     ConfigModule,
     SocketModule,
+    UsersModule,
   ],
   controllers: [ProductsController],
   providers: [ProductsService, ProductsSubscriber],

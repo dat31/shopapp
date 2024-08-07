@@ -24,8 +24,10 @@ export class FirebaseAuthGuard extends AuthGuard('jwt') implements CanActivate {
     return super.canActivate(context);
   }
 
-  handleRequest<TUser = any>(err: any, user: any): TUser {
+  handleRequest<TUser = any>(err: any, user: any, info: any): TUser {
     if (err || !user) {
+      console.log('auth guard', err, user, info);
+
       throw err || new UnauthorizedException();
     }
     return user;

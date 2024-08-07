@@ -4,10 +4,7 @@ import { UpdateProductDto } from './dto/update-product.dto';
 import { In, Repository } from 'typeorm';
 import { Product } from './entities/product.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { SocketService } from 'socket/socket.service';
 import { Category } from 'routes/categories/entities/category.entity';
-import { FirebaseAdminService } from 'firebase-admin/firebase-admin.service';
-import { S3Service } from 's3/s3.service';
 import { User } from 'routes/users/entities/user.entity';
 
 @Injectable()
@@ -15,10 +12,6 @@ export class ProductsService {
   constructor(
     @InjectRepository(Product) private prodRepo: Repository<Product>,
     @InjectRepository(Category) private catRepo: Repository<Product>,
-
-    private socketService: SocketService,
-    private firebaseAdminService: FirebaseAdminService,
-    private s3Service: S3Service,
   ) {}
 
   async create(uid: User['uid'], { category, ...body }: CreateProductDto) {
@@ -26,6 +19,7 @@ export class ProductsService {
       ...new Product(),
       ...body,
     } as unknown as Product;
+    console.log(prod, uid);
     if (category?.id) {
       const prodCategory = await this.catRepo.findOne({
         where: { id: category?.id },
@@ -37,13 +31,17 @@ export class ProductsService {
   }
 
   async findAll(uid: User['uid']) {
+    console.log('get all uid', uid);
     return this.prodRepo.find({
       relations: { category: true },
-      where: {
-        user: {
-          owner: { uid },
+      where: [
+        {
+          user: {
+            owner: { uid },
+          },
         },
-      },
+        { user: { uid } },
+      ],
     });
   }
 
@@ -53,13 +51,6 @@ export class ProductsService {
       where: { id },
       relations: { category: true },
     });
-
-    // return this.prodRepo
-    //   .createQueryBuilder()
-    //   .withDeleted()
-    //   .where({ id })
-    //   .leftJoinAndSelect('category', 'category')
-    //   .getOne();
   }
 
   update(id: number, updateProductDto: UpdateProductDto) {
